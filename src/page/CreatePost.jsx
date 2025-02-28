@@ -20,13 +20,18 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  // Handle input changes
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
+  // Generate a random prompt
   const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(form.prompt);
     setForm({ ...form, prompt: randomPrompt });
   };
 
+  // Call the backend to generate an image
   const generateImage = async () => {
     if (form.prompt) {
       try {
@@ -36,12 +41,13 @@ const CreatePost = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            prompt: form.prompt,
-          }),
+          body: JSON.stringify({ prompt: form.prompt }),
         });
 
         const data = await response.json();
+
+        // The backend returns a raw base64 string in data.photo,
+        // so we prepend the 'data:image/jpeg;base64,' prefix here.
         setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
       } catch (err) {
         alert(err);
@@ -49,13 +55,15 @@ const CreatePost = () => {
         setGeneratingImg(false);
       }
     } else {
-      alert('Please provide proper prompt');
+      alert('Please provide a prompt first.');
     }
   };
 
+  // Handle the final "Share with the Community" submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Only share if we have both a prompt and a generated photo
     if (form.prompt && form.photo) {
       setLoading(true);
       try {
@@ -76,7 +84,7 @@ const CreatePost = () => {
         setLoading(false);
       }
     } else {
-      alert('Please generate an image with proper details');
+      alert('Please generate an image with a valid prompt before sharing.');
     }
   };
 
@@ -84,7 +92,9 @@ const CreatePost = () => {
     <section className="max-w-7xl mx-auto">
       <div>
         <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
-        <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">Generate an imaginative image through DALL-E AI and share it with the community</p>
+        <p className="mt-2 text-[#666e75] text-[14px] max-w-[500px]">
+          Generate an imaginative image through DALL-E AI (or Stability AI) and share it with the community
+        </p>
       </div>
 
       <form className="mt-16 max-w-3xl" onSubmit={handleSubmit}>
@@ -109,8 +119,9 @@ const CreatePost = () => {
             handleSurpriseMe={handleSurpriseMe}
           />
 
+          {/* Image Preview */}
           <div className="relative bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
-            { form.photo ? (
+            {form.photo ? (
               <img
                 src={form.photo}
                 alt={form.prompt}
@@ -132,6 +143,7 @@ const CreatePost = () => {
           </div>
         </div>
 
+        {/* Generate button */}
         <div className="mt-5 flex gap-5">
           <button
             type="button"
@@ -142,8 +154,11 @@ const CreatePost = () => {
           </button>
         </div>
 
+        {/* Share with the community */}
         <div className="mt-10">
-          <p className="mt-2 text-[#666e75] text-[14px]">** Once you have created the image you want, you can share it with others in the community **</p>
+          <p className="mt-2 text-[#666e75] text-[14px]">
+            ** Once you have created the image you want, you can share it with others in the community **
+          </p>
           <button
             type="submit"
             className="mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center"
