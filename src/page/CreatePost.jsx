@@ -10,6 +10,7 @@ const CreatePost = () => {
   
   // Use environment variable or default to current origin for API requests
   const API_URL = import.meta.env.VITE_API_URL || '';
+  const API_URL = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
   const [form, setForm] = useState({
     name: '',
